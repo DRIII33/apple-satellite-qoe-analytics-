@@ -1,5 +1,4 @@
-# Dashboard Guide & Storytelling Brief: OrbitPulse Looker Studio
-
+# Looker Studio Dashboard Guide: OrbitPulse Telemetry Command Center
 ---
 
 #### **Data Analyst:** Daniel Rodriguez III
@@ -8,32 +7,30 @@
 
 ---
 
-## Dashboard Canvas Architecture
-The **OrbitPulse Looker Studio Executive Dashboard** translates complex satellite telemetry into interactive visual indicators designed for network operation directors and engineering leads.
+## Dashboard Overview
+The **OrbitPulse Telemetry Command Center** is a high-impact Looker Studio visual interface designed for hardware engineers, telemetry analysts, and executive leadership within Apple's Satellite Connectivity Group. It translates raw underlying BigQuery views (`agg_daily_qoe` and `fact_satellite_qoe`) into real-time visual metrics, performance trends, and statistical alerts.
 
 ---
 
-## Visual Component Reference & Data Story
+## Core Visual Modules & KPIs
 
-### 1. Header Banner & Global Control Bar
-* **Controls:** Filter by `Device Model`, `Service Type`, and `Session Date`.
-* **Story:** Enables cross-functional teams to isolate performance across specific hardware (e.g., iPhone 17 Pro vs. Apple Watch Ultra 2) or messaging types.
+### 1. Primary Header KPIs (Top Scorecards)
+* **Total Session Volume (`SUM(total_sessions)`)**: Ingested handshake events over the target operational period.
+* **Average Handshake Latency (`avg_latency_ms`)**: Average latency (in ms) across all satellite connection requests.
+* **SLA Degraded Session Rate (%)**: Percentage of total sessions failing baseline QoE thresholds ($\text{Handshake Latency} > 2500\text{ ms}$ or $\text{Packet Drop Rate} > 0.25$).
+* **ML Anomaly Rate (%)**: Percentage of sessions flagged as statistical outliers by the BigQuery ML PCA model (`ml_anomaly_flag = 1`).
 
-### 2. Executive KPI Scorecards
-* **Total Connection Sessions (`100,000`):** Confirms complete data capture over the 31-day monitoring window.
-* **Avg Handshake Latency (`1,074.54 ms`):** Volume-weighted average latency across all global handshakes.
-* **SLA Degraded Session Rate (`11.28%`):** Tracks overall business SLA compliance ($>1,200\text{ ms}$ latency or $>5\%$ packet loss).
-* **ML Flagged Anomalies (`3.00%`):** Quantifies multi-variate statistical anomalies detected by machine learning.
+### 2. SLA Performance & Degradation Trends
+* **Degraded Session Distribution by Device Model**: Bar chart comparing degradation rates between iPhone generations and Apple Watch Ultra hardware.
+* **Daily QoE Tier Breakdown**: Stacked area chart showing relative daily proportions of Optimal vs. Acceptable vs. Degraded connection sessions.
 
-### 3. Time-Series Line Chart: `Daily Latency Trend by Firmware`
-* **X-Axis:** `session_date` | **Y-Axis:** `avg_latency_ms` | **Breakdown:** `firmware_version`
-* **Data Story:** Visually isolates `v18.2.0-b2` as a sustained top-line orange curve ($\sim 1,510\text{ ms}$) hovering far above stable builds `v18.1.0` and `v18.2.1` ($\sim 887\text{ ms}$), proving the regression was constant throughout August.
+### 3. Machine Learning Anomaly Detection Suite
+* **Anomalous vs. Standard Latency Profile**: Dual-axis scatter/line chart overlaying standard operational latency against ML-detected anomaly clusters.
+* **Ground Station & Firmware Anomaly Heatmap**: Visual matrix isolating specific ground station IDs or firmware builds driving localized network instability.
 
-### 4. Heatmap Table: `Packet Drop Rate by Ground Station`
-* **Dimension:** `ground_station_id` | **Metric:** `packet_drop_rate` (Formatted as %)
-* **Data Story:** Displays metric conditional heat-shading, instantly highlighting `GS-CA-B` in dark blue at **14.12%**, compared to 6.97%–7.00% across remaining stations.
+---
 
-### 5. Detail Table: `Flagged Session Anomalies`
-* **Dimensions:** `session_date`, `device_model`, `timestamp`, `handshake_latency_ms`, `packet_drop_rate`
-* **Filter:** `is_anomaly = 1`
-* **Data Story:** Provides granular session level verification (`1-100 / 3000` records), showing extreme failure instances (e.g., drop rates reaching 93.01%).
+## User Interaction & Dynamic Filtering
+* **Global Date & Time Range Picker**: Allows drill-down analysis into specific orbital events, software release dates, or outage windows.
+* **Hardware & Firmware Selectors**: Interactive dropdowns enabling hardware teams to isolate specific device models (`device_model`) or software builds (`firmware_version`) for rapid patch validation.
+* **Service Type Filter**: Segregates voice, messaging, and background location payload telemetry.
